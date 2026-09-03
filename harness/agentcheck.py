@@ -187,7 +187,12 @@ def agent_command(config: dict) -> list[str]:
             "skip: a gate that quietly drops its end-to-end rung reports green having "
             "never touched the app."
         )
-    return shlex.split(cmd, posix=os.name != "nt")
+    argv = shlex.split(cmd, posix=os.name != "nt")
+    if os.name == "nt" and argv:
+        which = shutil.which(argv[0])
+        if which:
+            argv[0] = which
+    return argv
 
 
 def run_rung(kind: str, config: dict, app, only: str = "") -> tuple[int, int, list[str]]:

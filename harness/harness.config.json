@@ -83,7 +83,7 @@
     "using an app and writing down what happened."
   ],
   "agent": {
-    "cmd": "pi --mode json --print",
+    "cmd": "pi.cmd --mode json --print",
     "timeout_s": 900
   },
   "driver": "http",
