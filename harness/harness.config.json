@@ -83,11 +83,11 @@
     "using an app and writing down what happened."
   ],
   "agent": {
-    "cmd": "pi.cmd --mode json --print",
+    "cmd": "pi.cmd --model google/gemini-flash-latest --mode json --print",
     "timeout_s": 900
   },
   "driver": "http",
-  "e2e_timeout_s": 300,
+  "e2e_timeout_s": 900,
   "http": {
     "start": "python -m uvicorn app.main:app --port {port}",
     "health_path": "/health",

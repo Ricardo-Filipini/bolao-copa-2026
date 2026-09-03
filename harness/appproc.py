@@ -118,6 +118,17 @@ class HttpApp:
             _argv(cmd), cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, encoding="utf-8", errors="replace", env=env,
         )
+        import threading
+        self._output_lines: list[str] = []
+        def _drain_stdout() -> None:
+            if self.proc and self.proc.stdout:
+                try:
+                    for line in iter(self.proc.stdout.readline, ""):
+                        self._output_lines.append(line)
+                except Exception:
+                    pass
+        self._drain_thread = threading.Thread(target=_drain_stdout, daemon=True)
+        self._drain_thread.start()
         self._await_health()
         print(f"APP_STARTED port={self.port}", flush=True)
         return self
@@ -188,7 +199,7 @@ class HttpApp:
         last = "never answered"
         while time.time() < deadline:
             if self.proc and self.proc.poll() is not None:
-                out = (self.proc.stdout.read() if self.proc.stdout else "") or ""
+                out = "".join(self._output_lines)
                 raise AppDidNotStart(
                     f"the app exited with {self.proc.returncode} before answering:\n{out[-2500:]}"
                 )
