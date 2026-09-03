@@ -24,7 +24,15 @@ class Score(BaseModel):
     away: int = Field(..., ge=0, description="Gols da equipe visitante")
 
 
+class Participant(BaseModel):
+    id: str = Field(..., min_length=1, description="Identificador único")
+    name: str = Field(..., min_length=1, description="Nome completo")
+    birth_date: str | None = Field(default=None, description="Data de nascimento")
+    champion: str | None = Field(default=None, description="Palpite de campeão")
+
+
 class Guess(BaseModel):
+    id: str | None = Field(default=None, description="Identificador do palpite")
     participant_id: str = Field(..., min_length=1, description="Identificador do participante")
     match_id: str = Field(..., min_length=1, description="Identificador da partida")
     score: Score = Field(..., description="Placar palpitado")

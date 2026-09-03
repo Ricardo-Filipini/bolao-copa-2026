@@ -16,17 +16,32 @@ class QuotaExceededError(ValueError):
     pass
 
 
-def _normalize_phase(phase: Phase | str) -> Phase:
+def normalize_phase(phase: Phase | str) -> Phase:
     if isinstance(phase, Phase):
         return phase
+    p = str(phase).lower().strip()
+    if "grupo" in p or "1ª" in p or "1a" in p or "group" in p:
+        return Phase.GROUP_STAGE
+    if "32" in p or "16 avos" in p or "16avos" in p or "2ª" in p or "2a" in p:
+        return Phase.ROUND_OF_32
+    if "oitava" in p or "16" in p or "3ª" in p or "3a" in p:
+        return Phase.ROUND_OF_16
+    if "quarta" in p or "quarter" in p or "4ª" in p or "4a" in p:
+        return Phase.QUARTER_FINALS
+    if "semi" in p or "5ª" in p or "5a" in p:
+        return Phase.SEMI_FINALS
+    if "final" in p or "6ª" in p or "6a" in p:
+        return Phase.FINAL
     try:
         return Phase(phase)
     except ValueError:
-        # Tenta casar por nome de atributo caso passe 'GROUP_STAGE' etc.
         try:
             return Phase[phase.upper()]
         except KeyError:
             raise ValueError(f"Fase inválida: {phase}")
+
+
+_normalize_phase = normalize_phase
 
 
 def get_phase_quota_limit(phase: Phase | str, total_matches: int | None = None) -> int | None:

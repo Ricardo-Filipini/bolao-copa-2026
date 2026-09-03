@@ -54,8 +54,8 @@ def calculate_match_score(
     - Placar não exato:
       - Acerto de resultado (vencedor ou empate não-exato): 3 pontos
       - Acerto de gols de uma equipe:
-        - 1 ponto se a equipe marcou <= 2 gols
-        - 2 pontos se a equipe marcou >= 3 gols
+        - 1 ponto se a equipe marcou <= 2 gols e o palpite acertou o número exato
+        - 2 pontos se a equipe marcou >= 3 gols e o palpite indicou faixa >= 3 gols
       - Pontuação máxima de placar não exato: 5 pontos (3 + 2).
     """
     if is_walkover:
@@ -88,11 +88,27 @@ def calculate_match_score(
     ):
         points += 3
 
-    # 2. Acerto do número de gols de uma equipe
-    if guess_home == actual_home:
-        points += 2 if actual_home >= 3 else 1
+    # 2. Acerto de gols:
+    # - Faixa de 3 ou mais gols: se equipe marcou >= 3 e palpite foi >= 3 -> +2 pontos
+    # - Acerto exato de gols (1 ou 2 gols): se equipe marcou > 0 e palpite == actual -> +1 ponto
+    if actual_home >= 3 and guess_home >= 3:
+        points += 2
+    elif actual_home > 0 and guess_home == actual_home:
+        points += 1
 
-    if guess_away == actual_away:
-        points += 2 if actual_away >= 3 else 1
+    if actual_away >= 3 and guess_away >= 3:
+        points += 2
+    elif actual_away > 0 and guess_away == actual_away:
+        points += 1
 
-    return points
+    # Empate não-exato onde ambas as equipes marcaram <= 2 gols
+    if (
+        guessed_draw
+        and actual_draw
+        and points == 3
+        and actual_home <= 2
+        and guess_home <= 2
+    ):
+        points += 1
+
+    return min(points, 5)

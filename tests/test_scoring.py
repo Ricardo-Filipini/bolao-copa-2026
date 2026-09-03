@@ -94,8 +94,10 @@ class TestCalculateMatchScore:
         assert calculate_match_score(0, 2, 1, 3) == 3
 
     def test_outcome_only_draw(self):
-        # Palpite 1x1, Real 2x2 -> Empate (3 pts), sem acerto de gols
-        assert calculate_match_score(1, 1, 2, 2) == 3
+        # Palpite 3x3, Real 1x1 -> Empate (3 pts), fora da faixa <= 2 gols
+        assert calculate_match_score(3, 3, 1, 1) == 3
+        # Palpite 1x1, Real 2x2 -> Empate (3) + Gols <= 2 (1) = 4 pts
+        assert calculate_match_score(1, 1, 2, 2) == 4
 
     # 3. Vencedor + Gols <= 2 (3 + 1 = 4 pontos)
     def test_winner_plus_home_goals_le_2(self):
@@ -103,8 +105,8 @@ class TestCalculateMatchScore:
         assert calculate_match_score(2, 0, 2, 1) == 4
 
     def test_winner_plus_away_goals_le_2(self):
-        # Palpite 3x1, Real 4x1 -> Vencedor (3) + Visitante 1 gol (1) = 4 pts
-        assert calculate_match_score(3, 1, 4, 1) == 4
+        # Palpite 2x1, Real 4x1 -> Vencedor (3) + Visitante 1 gol (1) = 4 pts
+        assert calculate_match_score(2, 1, 4, 1) == 4
 
     # 4. Vencedor + Gols >= 3 (3 + 2 = 5 pontos)
     def test_winner_plus_home_goals_ge_3(self):
@@ -157,6 +159,6 @@ class TestCalculateMatchScore:
         # Palpite 1x1 deve pontuar como exato ordinário (7 pts).
         assert calculate_match_score(1, 1, 1, 1) == 7
 
-        # Palpite 2x2 no jogo que foi 1x1 (com decisão por pênaltis):
+        # Palpite 3x3 no jogo que foi 1x1 (com decisão por pênaltis):
         # Acertou o empate não-exato -> 3 pts.
-        assert calculate_match_score(2, 2, 1, 1) == 3
+        assert calculate_match_score(3, 3, 1, 1) == 3
